@@ -101,7 +101,7 @@ bar_graph_df = bar_graph_df.groupby(by=['FormattedDate','Date'])['Quantity'].sum
 bar_graph_df = bar_graph_df.sort_values('Date')
 
 # Create a bar graph using Plotly Express
-fig = px.bar(bar_graph_df, x='FormattedDate', y='Quantity',text = 'Quantity',color_discrete_sequence=['#0083B8']*len(bar_graph_df),template='plotly_white',title='Bar Graph with Formatted Dates')
+fig = px.bar(bar_graph_df, x='FormattedDate', y='Quantity',text = 'Quantity',color_discrete_sequence=['#0083B8']*len(bar_graph_df),template='plotly_white',title=f""" {reporting_country} {commodity} {category}""")
 
 # Format the text to display without decimal places
 fig.update_traces(texttemplate='%{text:,.0f}', textposition='outside')

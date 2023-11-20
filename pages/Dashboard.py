@@ -9,15 +9,16 @@ st.set_page_config(page_title="Import / Export!!!", page_icon=":bar_chart:",layo
 st.title(" :bar_chart: Import / Export EDA")
 st.markdown('<style>div.block-container{padding-top:1rem;}</style>',unsafe_allow_html=True)
 
-fl = st.file_uploader(":file_folder: Upload a file",type=(["csv","txt","xlsx","xls"]))
-if fl is not None:
-    filename = fl.name
-    st.write(filename)
-    df = pd.read_csv(filename, encoding = "ISO-8859-1")
-else:
-    os.chdir(r"C:\My Data\Rahul Edrive\my_code\dashboard")
-    df = pd.read_excel("Final consolidation US.xlsx")
+# fl = st.file_uploader(":file_folder: Upload a file",type=(["csv","txt","xlsx","xls"]))
+# if fl is not None:
+#     filename = fl.name
+#     st.write(filename)
+#     df = pd.read_csv(filename, encoding = "ISO-8859-1")
+# else:
+#     os.chdir(r"C:\My Data\Rahul Edrive\my_code\dashboard")
+#     df = pd.read_excel("Final consolidation US.xlsx")
 
+df = pd.read_excel("Final consolidation US.xlsx")
 
 col1, col2 = st.columns((2))
 df["Date"] = pd.to_datetime(df["Date"])

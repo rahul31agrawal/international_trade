@@ -11,7 +11,13 @@ st.title(" :bar_chart: Import / Export Dashboard")
 st.markdown('<style>div.block-container{padding-top:1rem;} </style>',unsafe_allow_html=True)
 
 
-file_path = "pages/Final consolidation US.xlsx"
+
+
+# Get the current working directory (where the script is located)
+current_dir = os.path.dirname(os.path.realpath(__file__))
+
+# Specify the relative path to the Excel file
+file_path = os.path.join(current_dir, "..", "Final consolidation US.xlsx")
 
 # Read the Excel file
 df = pd.read_excel(file_path)

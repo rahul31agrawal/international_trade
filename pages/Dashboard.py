@@ -3,124 +3,121 @@ import plotly.express as px
 import pandas as pd
 import os 
 import warnings
+
 warnings.filterwarnings('ignore')
-st.set_page_config(page_title="Import / Export!!!", page_icon=":bar_chart:",layout="wide")
+st.set_page_config(page_title="Import / Export Dashboard!!!", page_icon=":bar_chart:",layout="wide")
 
-st.title(" :bar_chart: Import / Export EDA")
-st.markdown('<style>div.block-container{padding-top:1rem;}</style>',unsafe_allow_html=True)
+st.title(" :bar_chart: Import / Export Dashboard")
+st.markdown('<style>div.block-container{padding-top:1rem;} </style>',unsafe_allow_html=True)
 
-# fl = st.file_uploader(":file_folder: Upload a file",type=(["csv","txt","xlsx","xls"]))
-# if fl is not None:
-#     filename = fl.name
-#     st.write(filename)
-#     df = pd.read_csv(filename, encoding = "ISO-8859-1")
-# else:
-#     os.chdir(r"C:\My Data\Rahul Edrive\my_code\dashboard")
-#     df = pd.read_excel("Final consolidation US.xlsx")
 
+os.chdir(r"C:\My Data\Rahul Edrive\my_code\dashboard")
 df = pd.read_excel("Final consolidation US.xlsx")
 
-col1, col2 = st.columns((2))
-df["Date"] = pd.to_datetime(df["Date"])
 
-# Getting the min and max date 
-startDate = pd.to_datetime(df["Date"]).min()
-endDate = pd.to_datetime(df["Date"]).max()
+#df = df[(df["Date"] >= date1) & (df["Date"] <= date2)].copy()
 
-with col1:
-    date1 = pd.to_datetime(st.date_input("Start Date", startDate))
+df['Date'] = pd.to_datetime(df['Date'])
 
-with col2:
-    date2 = pd.to_datetime(st.date_input("End Date", endDate))
+# Extract the year and create a new column 'Year'
 
-
-df = df[(df["Date"] >= date1) & (df["Date"] <= date2)].copy()
+dashboard_df = df.copy()
 
 st.sidebar.header("Choose your filter: ")
 # Create for Category
-category = st.sidebar.multiselect("Import or Export", df["Category"].unique())
+category = st.sidebar.selectbox("Import or Export", dashboard_df["Category"].unique())
 if not category:
-    df2 = df.copy()
+    df2 = dashboard_df.copy()
 else:
-    df2 = df[df["Category"].isin(category)]
+    df2 = dashboard_df[dashboard_df["Category"].isin([category])]
 
 
 # Create for Commodity
-commodity = st.sidebar.multiselect("Pick the Commodity", df2["Commodity"].unique())
+commodity = st.sidebar.selectbox("Pick the Commodity", df2["Commodity"].unique())
 if not commodity:
     df3 = df2.copy()
 else:
-    df3 = df2[df2["Commodity"].isin(commodity)]
+    df3 = df2[df2["Commodity"].isin([commodity])]
 
 # Create for City
-reporting_country = st.sidebar.multiselect("Pick the Reporting Country",df3["Reporting Country"].unique())
+reporting_country = st.sidebar.selectbox("Pick the Reporting Country",df3["Reporting Country"].unique())
 
-# Filter the data based on category, State and City
-
-if not category and not commodity and not reporting_country:
-    filtered_df = df
-elif not commodity and not reporting_country:
-    filtered_df = df[df["Category"].isin(category)]
-elif not category and not reporting_country:
-    filtered_df = df[df["Commodity"].isin(commodity)]
-elif commodity and reporting_country:
-    filtered_df = df3[df["Commodity"].isin(commodity) & df3["Reporting Country"].isin(reporting_country)]
-elif category and reporting_country:
-    filtered_df = df3[df["Category"].isin(category) & df3["Reporting Country"].isin(reporting_country)]
-elif category and commodity:
-    filtered_df = df3[df["Category"].isin(category) & df3["Commodity"].isin(commodity)]
-elif reporting_country:
-    filtered_df = df3[df3["Reporting Country"].isin(reporting_country)]
+# create for reporting country
+if not commodity:
+    df4 = df3.copy()
 else:
-    filtered_df = df3[df3["Category"].isin(category) & df3["Commodity"].isin(commodity) & df3["Reporting Country"].isin(reporting_country)]
+    df4 = df3[df3["Reporting Country"].isin([reporting_country])]
 
 
-# My code starts here
+# Create for Year
+selected_year = st.sidebar.selectbox("Pick the year",df4["Year"].unique())
 
-filtered_df.rename(columns={'Date':'date'}, inplace=True)
-# Find the latest date
-latest_date = filtered_df['date'].max()
 
-# Create copies for calculations
-latest_date_minus_1 = latest_date - pd.DateOffset(months=1)
-latest_date_prev_year = latest_date - pd.DateOffset(years=1)
-second_filtered_df = filtered_df[(filtered_df['date'] == latest_date) | (filtered_df['date'] == latest_date_minus_1) | (filtered_df['date'] == latest_date_prev_year)]
+def apply_filter(df, category, commodity, reporting_country, year):
+    if not category and not commodity and not reporting_country:
+        filtered_df = df[df["Year"] == year]
+    elif not category and not reporting_country:
+        filtered_df = df[df["Category"].isin([category]) & (df["Year"] == year)]
+    elif not commodity and not reporting_country:
+        filtered_df = df[df["Commodity"].isin([commodity]) & (df["Year"] == year)]
+    elif commodity and reporting_country:
+        filtered_df = df[df["Commodity"].isin([commodity]) & df["Reporting Country"].isin([reporting_country]) & (df["Year"] == year)]
+    elif category and reporting_country:
+        filtered_df = df[df["Category"].isin([category]) & df["Reporting Country"].isin([reporting_country]) & (df["Year"] == year)]
+    elif category and commodity:
+        filtered_df = df[df["Category"].isin([category]) & df["Commodity"].isin([commodity]) & (df["Year"] == year)]
+    elif reporting_country:
+        filtered_df = df[df["Reporting Country"].isin([reporting_country]) & (df["Year"] == year)]
+    else:
+        filtered_df = df[df["Category"].isin([category]) & df["Commodity"].isin([commodity]) & df["Reporting Country"].isin([reporting_country]) & (df["Year"] == year)]
 
-#second_filtered_df.groupby(['Partner Country','date'])['Quantity'].sum().reset_index().pivot_table(index = ['Partner Country'], columns = ['date'])['Quantity']
-
-second_filtered_df["Quantity"] = second_filtered_df["Quantity"].astype(int)
-# Create a pivot table
-pivot_table_df = second_filtered_df.pivot_table(index=['Partner Country'], columns=['date'], values='Quantity', aggfunc='sum')
-
-# Sort columns in decreasing order of date
-pivot_table_df = pivot_table_df[sorted(pivot_table_df.columns, reverse=True)]
-
-# Find the name of the second column dynamically
-second_column_name = pivot_table_df.columns[1]
-
-# Sort DataFrame based on the second column
-sorted_df = pivot_table_df.sort_values(by=second_column_name, ascending=False)
-# Convert the column names to datetime objects
-sorted_df.columns = pd.to_datetime(sorted_df.columns)
-
-# Format the datetime objects as desired (e.g., 'Month'YY)
-formatted_columns = sorted_df.columns.strftime('%B\'%y')
-
-#In this example, the %B format code is used to represent the full month name, and %y is used to represent the last two digits of the year.
-
-# Rename the DataFrame columns with the formatted values
-sorted_df.columns =  formatted_columns
+    return filtered_df
 
 
 
+result_df = apply_filter(df4, category, commodity, reporting_country, selected_year)
 
-sorting_column = "September'23"
 
-# Remove commas and convert the values in the sorting column to numeric
-sorted_df[sorting_column] = pd.to_numeric(sorted_df[sorting_column].replace(',', ''), errors='coerce')
 
-# Sort the DataFrame based on the specified column
-df_sorted = sorted_df.sort_values(by=sorting_column, ascending=False)
+# Create a new column for formatted dates
+result_df['FormattedDate'] = result_df['Date'].dt.strftime('%b %y')
 
-with col1:
-    st.dataframe(df_sorted, height=300)
+bar_graph_df = result_df.copy()
+
+bar_graph_df = bar_graph_df.groupby(by=['FormattedDate','Date'])['Quantity'].sum().reset_index()
+
+# Sort the DataFrame by the datetime column
+bar_graph_df = bar_graph_df.sort_values('Date')
+
+# Create a bar graph using Plotly Express
+fig = px.bar(bar_graph_df, x='FormattedDate', y='Quantity',text = 'Quantity',color_discrete_sequence=['#F63366']*len(bar_graph_df),template='plotly_white',title='Bar Graph with Formatted Dates')
+
+# Format the text to display without decimal places
+fig.update_traces(texttemplate='%{text:,.0f}', textposition='outside')
+# Show the plot
+st.plotly_chart(fig)
+
+doughnut_chart_df = result_df.copy()
+doughnut_chart_df = doughnut_chart_df.groupby(by=['Partner Country'])['Quantity'].sum().reset_index()
+#Create a doughnut chart using Plotly Express
+# Sort the DataFrame by Quantity in descending order and select the top 10
+top_10_df = doughnut_chart_df.sort_values(by='Quantity', ascending=False).head(10)
+
+# Create a doughnut chart using Plotly Express
+pie_fig = px.pie(top_10_df, values='Quantity', names='Partner Country', hole=.5)
+
+# Customize the layout
+pie_fig.update_layout(
+    title="Doughnut Chart with Top 10 Partner Countries",
+    template="plotly_white",
+    height=500,
+    width=500,
+    showlegend=True, 
+    
+)
+
+# Set textinfo for values and percentage
+pie_fig.update_traces(textinfo='value+percent', insidetextorientation='radial',  # Display text radially inside
+    textposition='outside')
+
+st.plotly_chart(pie_fig)

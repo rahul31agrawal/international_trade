@@ -11,7 +11,7 @@ st.title(" :bar_chart: Import / Export Dashboard")
 st.markdown('<style>div.block-container{padding-top:1rem;} </style>',unsafe_allow_html=True)
 
 
-os.chdir(r"C:\My Data\Rahul Edrive\my_code\dashboard")
+
 df = pd.read_excel("Final consolidation US.xlsx")
 
 

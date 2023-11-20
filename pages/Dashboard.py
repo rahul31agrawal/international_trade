@@ -11,8 +11,13 @@ st.title(" :bar_chart: Import / Export Dashboard")
 st.markdown('<style>div.block-container{padding-top:1rem;} </style>',unsafe_allow_html=True)
 
 
+file_path = "pages/Final consolidation US.xlsx"
 
-df = pd.read_excel("Final consolidation US.xlsx")
+# Read the Excel file
+df = pd.read_excel(file_path)
+
+
+#df = pd.read_excel("Final consolidation US.xlsx")
 
 
 #df = df[(df["Date"] >= date1) & (df["Date"] <= date2)].copy()

@@ -21,7 +21,8 @@ st.markdown('<style>div.block-container{padding-top:1rem;} </style>',unsafe_allo
 
 df = pd.read_excel("Final consolidation India.xlsx")
 col1, col2 = st.columns((2))
-df["Date"] = pd.to_datetime(df["Date"])
+#df["Date"] = pd.to_datetime(df["Date"])
+df["Date"] = pd.to_datetime(df["Date"], format="%d-%m-%Y")
 
 # Getting the min and max date 
 startDate = pd.to_datetime(df["Date"]).min()

@@ -17,7 +17,7 @@ st.markdown('<style>div.block-container{padding-top:1rem;} </style>',unsafe_allo
 current_dir = os.path.dirname(os.path.realpath(__file__))
 
 # Specify the relative path to the Excel file
-file_path = os.path.join(current_dir, "..", "Final consolidation US.xlsx")
+file_path = os.path.join(current_dir, "..", "Final consolidation India.xlsx")
 
 # Read the Excel file
 df = pd.read_excel(file_path)

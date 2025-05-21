@@ -28,7 +28,8 @@ df = pd.read_excel(file_path)
 
 #df = df[(df["Date"] >= date1) & (df["Date"] <= date2)].copy()
 
-df['Date'] = pd.to_datetime(df['Date'])
+#df['Date'] = pd.to_datetime(df['Date'])
+df["Date"] = pd.to_datetime(df["Date"], format="%d-%m-%Y")
 
 # Extract the year and create a new column 'Year'
 

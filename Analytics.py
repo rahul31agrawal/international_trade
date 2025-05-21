@@ -17,8 +17,9 @@ st.markdown('<style>div.block-container{padding-top:1rem;} </style>',unsafe_allo
 # else:
 #     os.chdir(r"C:\My Data\Rahul Edrive\my_code\dashboard")
 #     df = pd.read_excel("Final consolidation US.xlsx")
-df = pd.read_excel("Final consolidation US.xlsx")
+#df = pd.read_excel("Final consolidation US.xlsx")
 
+df = pd.read_excel("Final consolidation India.xlsx")
 col1, col2 = st.columns((2))
 df["Date"] = pd.to_datetime(df["Date"])
 
